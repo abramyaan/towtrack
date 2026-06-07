@@ -71,6 +71,7 @@ const priceList = [
   { name: "Мини экскаватор", price: "2 800 ₽/час", min: "Минимум 4 часа (смена 8 ч — 18 000 ₽)" },
 ];
 
+
 function Index() {
   return (
     <div className="min-h-screen bg-background">
@@ -82,9 +83,20 @@ function Index() {
       <RequestForm />
       <Contacts />
       <Footer />
+
+      {/* Кнопка звонка справа внизу */}
+      <a
+        href="tel:+79655067816"
+        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl transition-transform active:scale-90"
+      >
+        <Phone className="h-6 w-6" />
+        <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-25" />
+      </a>
     </div>
   );
 }
+
+export default Index;
 
 function Header() {
   return (
@@ -107,7 +119,7 @@ function Header() {
         </nav>
         <div className="flex items-center gap-2 sm:gap-3">
           <a href="tel:+79655067816" aria-label="Позвонить"
-             className="hidden sm:flex items-center gap-2 text-sm font-semibold text-foreground hover:text-primary">
+            className="hidden sm:flex items-center gap-2 text-sm font-semibold text-foreground hover:text-primary">
             <Phone className="size-4" />
             +7 (965) 506-78-16
           </a>
@@ -151,7 +163,7 @@ function Hero() {
                     width={1280}
                     height={896}
                     loading={idx === 0 ? "eager" : "lazy"}
-                    className="w-full h-full object-contain bg-secondary/40"
+                    className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 bg-gradient-to-t from-background/95 via-background/80 to-transparent">
                     <div className="flex items-end justify-between gap-3 flex-wrap">
@@ -165,11 +177,11 @@ function Hero() {
                 </div>
               ))}
               <button onClick={prev} aria-label="Назад"
-                className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 size-10 rounded-full bg-background/90 hover:bg-primary hover:text-primary-foreground grid place-items-center shadow-lg transition">
+                className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 size-10 rounded-full bg-background/90 hover:bg-[#1A1A1A] hover:text-white grid place-items-center shadow-lg transition">
                 <ChevronLeft className="size-5" />
               </button>
               <button onClick={next} aria-label="Вперёд"
-                className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 size-10 rounded-full bg-background/90 hover:bg-primary hover:text-primary-foreground grid place-items-center shadow-lg transition">
+                className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 size-10 rounded-full bg-background/90 hover:bg-[#1A1A1A] hover:text-white grid place-items-center shadow-lg transition">
                 <ChevronRight className="size-5" />
               </button>
             </div>
@@ -177,7 +189,7 @@ function Hero() {
             <div className="mt-4 flex justify-center gap-2">
               {slides.map((_, idx) => (
                 <button key={idx} aria-label={`Слайд ${idx + 1}`} onClick={() => setI(idx)}
-                  className={`h-1.5 rounded-full transition-all ${idx === i ? "w-8 bg-primary" : "w-3 bg-border"}`} />
+                  className={`h-1.5 rounded-full transition-all ${idx === i ? "w-8 bg-[#1A1A1A]" : "w-3 bg-border"}`} />
               ))}
             </div>
           </div>
@@ -185,9 +197,11 @@ function Hero() {
           {/* Правая колонка — заголовок, УТП, кнопка */}
           <div className="w-full lg:w-1/2 flex flex-col gap-6">
             <div>
-              <span className="inline-block text-xs sm:text-sm font-semibold tracking-wider uppercase text-primary bg-secondary px-3 py-1 rounded-full">
-                Екатеринбург и область
-              </span>
+              <div className="text-center lg:text-center">
+                <span className="inline-block text-xs sm:text-sm font-semibold tracking-wider uppercase text-primary bg-secondary px-3 py-1 rounded-full">
+                  Екатеринбург и область
+                </span>
+              </div>
               <h1 className="mt-3 text-3xl sm:text-4xl lg:text-5xl font-bold">
                 Аренда спецтехники с подачей <span className="text-primary">за час</span>
               </h1>
@@ -245,7 +259,7 @@ function Catalog() {
             <article key={c.title} className="group bg-card border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition flex flex-col">
               <div className="aspect-[4/3] bg-secondary/40 overflow-hidden">
                 <img src={c.image} alt={c.title} width={1280} height={896} loading="lazy"
-                     className="w-full h-full object-contain group-hover:scale-105 transition duration-500" />
+                  className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
               </div>
               <div className="p-5 flex flex-col gap-3 flex-1">
                 <h3 className="text-xl font-bold">{c.title}</h3>
@@ -308,7 +322,7 @@ function PriceList() {
         <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
           {priceList.map((row, idx) => (
             <div key={row.name}
-                 className={`grid sm:grid-cols-[1fr_auto_auto] gap-2 sm:gap-6 items-center px-5 sm:px-7 py-4 sm:py-5 ${idx !== 0 ? "border-t border-border" : ""}`}>
+              className={`grid sm:grid-cols-[1fr_auto_auto] gap-2 sm:gap-6 items-center px-5 sm:px-7 py-4 sm:py-5 ${idx !== 0 ? "border-t border-border" : ""}`}>
               <div className="font-semibold">{row.name}</div>
               <div className="text-sm text-muted-foreground">{row.min}</div>
               <div className="text-lg font-bold text-primary sm:text-right">{row.price}</div>
@@ -322,17 +336,54 @@ function PriceList() {
 
 function RequestForm() {
   const [sent, setSent] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+
+  const handlePhone = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let val = e.target.value.replace(/\D/g, "");
+    if (val.startsWith("8")) val = "7" + val.slice(1);
+    if (val.startsWith("7")) val = val;
+    else if (val.length > 0) val = "7" + val;
+    if (val.length > 11) val = val.slice(0, 11);
+    setPhone(val ? "+" + val : "");
+    setPhoneError("");
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const digits = phone.replace(/\D/g, "");
+    if (digits.length !== 11) {
+      setPhoneError("Введите корректный номер (11 цифр)");
+      return;
+    }
+    setSent(true);
+  };
+
   return (
     <section id="request" className="py-16 sm:py-24 bg-secondary/40">
       <div className="max-w-3xl mx-auto px-4">
         <SectionHead kicker="Заявка" title="Оставьте заявку — перезвоним за 15 минут" />
         <form
-          onSubmit={(e) => { e.preventDefault(); setSent(true); }}
+          onSubmit={handleSubmit}
           className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-sm grid gap-4"
         >
           <div className="grid sm:grid-cols-2 gap-4">
             <Field label="Ваше имя" name="name" placeholder="Иван" required />
-            <Field label="Телефон" name="phone" type="tel" placeholder="+7 (___) ___-__-__" required />
+            <div className="grid">
+              <label className="text-sm font-semibold mb-1.5">
+                Телефон <span className="text-primary">*</span>
+              </label>
+              <input
+                name="phone"
+                type="tel"
+                placeholder="+7"
+                value={phone}
+                onChange={handlePhone}
+                required
+                className={`bg-background border rounded-lg px-3 py-3 outline-none focus:ring-2 focus:ring-ring ${phoneError ? "border-destructive" : "border-input"}`}
+              />
+              {phoneError && <p className="text-xs text-destructive mt-1">{phoneError}</p>}
+            </div>
           </div>
           <div className="grid">
             <label className="text-sm font-semibold mb-1.5">Какая техника нужна</label>
@@ -343,7 +394,7 @@ function RequestForm() {
           </div>
           <div className="grid">
             <label className="text-sm font-semibold mb-1.5">Комментарий</label>
-            <textarea name="comment" rows={3} placeholder="Адрес, дата, что нужно сделать"
+            <textarea name="comment" rows={3} placeholder="Адрес, дата, что нужно сделать (необязательно)"
                       className="bg-background border border-input rounded-lg px-3 py-3 outline-none focus:ring-2 focus:ring-ring" />
           </div>
           <button type="submit" className="btn-primary hover:btn-primary-hover justify-self-start">
