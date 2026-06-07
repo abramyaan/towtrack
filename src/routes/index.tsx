@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import tgIcon from "@/assets/tg.png";
+import maxIcon from "@/assets/max.png";
 import {
   Phone, Mail, MapPin, Truck, Wrench, ChevronLeft, ChevronRight,
-  Shield, Clock, Award, ThumbsUp, Check,
+  Shield, Clock, Award, ThumbsUp, Check, Menu, X,
 } from "lucide-react";
 
 import evacuator from "@/assets/evacu.jpeg";
@@ -38,25 +40,25 @@ const utp = [
 const catalog = [
   {
     title: "Эвакуатор",
-    image: evacuator,
+    images: [evacuator, evacuator, evacuator],
     price: "от 2 000 ₽/час",
     specs: ["Грузоподъёмность до 5 т", "Платформа 5,5 м", "Лебёдка 5 т", "Полная и частичная погрузка"],
   },
   {
     title: "Манипулятор",
-    image: manipulator,
+    images: [manipulator, manipulator, manipulator],
     price: "от 2 500 ₽/час",
     specs: ["Стрела до 7 т / 20 м", "Кузов 6,2 × 2,4 м", "Грузоподъёмность борта 10 т", "Работа с длинномерами"],
   },
   {
     title: "Мини самосвал",
-    image: samosval,
+    images: [samosval, samosval],
     price: "от 2 200 ₽/час",
     specs: ["Объём кузова до 6 м³", "Грузоподъёмность 5 т", "Самосвальная разгрузка", "Сыпучие и строй-мусор"],
   },
   {
     title: "Мини экскаватор",
-    image: excavator,
+    images: [excavator, excavator],
     price: "от 2 800 ₽/час",
     specs: ["Глубина копания 3 м", "Ширина 1,5 м (узкие места)", "Сменные ковши", "Для частных и стройплощадок"],
   },
@@ -99,6 +101,8 @@ function Index() {
 export default Index;
 
 function Header() {
+  const [open, setOpen] = useState(false);
+
   return (
     <header className="sticky top-0 z-40 backdrop-blur bg-background/85 border-b border-border">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
@@ -108,18 +112,22 @@ function Header() {
           </div>
           <div className="leading-tight">
             <div className="font-bold text-base sm:text-lg">СпецАвто 96</div>
-            <div className="text-[11px] sm:text-xs text-muted-foreground">Аренда спецтехники · Екатеринбург</div>
+            <div className="text-[11px] sm:text-xs text-muted-foreground">Аренда спецтехники. Эвакуатор Екатеринбург</div>
           </div>
         </a>
+
+        {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
           <a href="#catalog" className="hover:text-primary">Каталог</a>
           <a href="#about" className="hover:text-primary">Услуги</a>
           <a href="#price" className="hover:text-primary">Цены</a>
           <a href="#contacts" className="hover:text-primary">Контакты</a>
         </nav>
-        <div className="flex items-center gap-2 sm:gap-3">
-          <a href="tel:+79655067816" aria-label="Позвонить"
-            className="hidden sm:flex items-center gap-2 text-sm font-semibold text-foreground hover:text-primary">
+
+        {/* Desktop right */}
+        <div className="hidden md:flex items-center gap-3">
+          <a href="tel:+79655067816"
+            className="flex items-center gap-2 text-sm font-semibold text-foreground hover:text-primary">
             <Phone className="size-4" />
             +7 (965) 506-78-16
           </a>
@@ -127,7 +135,37 @@ function Header() {
             Заявка
           </a>
         </div>
+
+        {/* Mobile right: иконки + бургер */}
+        <div className="flex md:hidden items-center gap-3">
+          
+          <a href="https://t.me/yourhandle" aria-label="Telegram" target="_blank" rel="noopener noreferrer"
+  className="size-10 rounded-xl grid place-items-center transition overflow-hidden">
+  <img src={tgIcon} alt="Telegram" className="w-full h-full object-cover" />
+</a>
+          <a href="https://max.ru/yourhandle" aria-label="Max" target="_blank" rel="noopener noreferrer"
+            className="size-10 rounded-xl bg-card border border-border grid place-items-center transition">
+            <img src={maxIcon} alt="Max" className="w-full h-full object-cover rounded-xl" />
+          </a>
+          <button onClick={() => setOpen(!open)} aria-label="Меню"
+            className="size-10 rounded-xl bg-card border border-border grid place-items-center hover:text-primary transition">
+            {open ? <X className="size-5" /> : <Menu className="size-5" />}
+          </button>
+        </div>
       </div>
+
+      {/* Mobile menu */}
+      {open && (
+        <div className="md:hidden border-t border-border bg-background/95 backdrop-blur px-4 py-4 flex flex-col gap-3">
+          <a href="#catalog" onClick={() => setOpen(false)} className="text-sm font-medium hover:text-primary py-2">Каталог</a>
+          <a href="#about" onClick={() => setOpen(false)} className="text-sm font-medium hover:text-primary py-2">Услуги</a>
+          <a href="#price" onClick={() => setOpen(false)} className="text-sm font-medium hover:text-primary py-2">Цены</a>
+          <a href="#contacts" onClick={() => setOpen(false)} className="text-sm font-medium hover:text-primary py-2">Контакты</a>
+          <a href="#request" onClick={() => setOpen(false)} className="btn-primary hover:btn-primary-hover w-full mt-1">
+            Оставить заявку
+          </a>
+        </div>
+      )}
     </header>
   );
 }
@@ -256,26 +294,73 @@ function Catalog() {
         <SectionHead kicker="Каталог" title="Спецтехника в аренду" subtitle="Современный автопарк. Опытные операторы. Работаем по Екатеринбургу и всей Свердловской области." />
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
           {catalog.map((c) => (
-            <article key={c.title} className="group bg-card border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition flex flex-col">
-              <div className="aspect-[4/3] bg-secondary/40 overflow-hidden">
-                <img src={c.image} alt={c.title} width={1280} height={896} loading="lazy"
-                  className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-              </div>
-              <div className="p-5 flex flex-col gap-3 flex-1">
-                <h3 className="text-xl font-bold">{c.title}</h3>
-                <div className="text-2xl font-bold text-primary">{c.price}</div>
-                <ul className="space-y-1.5 text-sm text-muted-foreground flex-1">
-                  {c.specs.map((s) => (
-                    <li key={s} className="flex gap-2"><Check className="size-4 text-primary shrink-0 mt-0.5" />{s}</li>
-                  ))}
-                </ul>
-                <a href="#request" className="btn-primary hover:btn-primary-hover w-full mt-2">Заказать</a>
-              </div>
-            </article>
+            <CatalogCard key={c.title} {...c} />
           ))}
         </div>
       </div>
     </section>
+  );
+}
+
+function CatalogCard({ title, images, price, specs }: {
+  title: string;
+  images: string[];
+  price: string;
+  specs: string[];
+}) {
+  const [idx, setIdx] = useState(0);
+  const prev = () => setIdx((p) => (p - 1 + images.length) % images.length);
+  const next = () => setIdx((p) => (p + 1) % images.length);
+
+  return (
+    <article className="group bg-card border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition flex flex-col">
+      <div className="relative aspect-[4/3] bg-secondary/40 overflow-hidden">
+        {images.map((src, i) => (
+          <img
+            key={i}
+            src={src}
+            alt={`${title} ${i + 1}`}
+            loading="lazy"
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${i === idx ? "opacity-100" : "opacity-0"}`}
+          />
+        ))}
+        {images.length > 1 && (
+          <>
+            <button
+              onClick={(e) => { e.preventDefault(); prev(); }}
+              className="absolute left-1.5 top-1/2 -translate-y-1/2 size-7 rounded-full bg-background/80 hover:bg-background grid place-items-center shadow transition"
+            >
+              <ChevronLeft className="size-4" />
+            </button>
+            <button
+              onClick={(e) => { e.preventDefault(); next(); }}
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 size-7 rounded-full bg-background/80 hover:bg-background grid place-items-center shadow transition"
+            >
+              <ChevronRight className="size-4" />
+            </button>
+            <div className="absolute bottom-2 inset-x-0 flex justify-center gap-1">
+              {images.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={(e) => { e.preventDefault(); setIdx(i); }}
+                  className={`h-1 rounded-full transition-all ${i === idx ? "w-5 bg-white" : "w-2 bg-white/50"}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+      <div className="p-5 flex flex-col gap-3 flex-1">
+        <h3 className="text-xl font-bold">{title}</h3>
+        <div className="text-2xl font-bold text-primary">{price}</div>
+        <ul className="space-y-1.5 text-sm text-muted-foreground flex-1">
+          {specs.map((s) => (
+            <li key={s} className="flex gap-2"><Check className="size-4 text-primary shrink-0 mt-0.5" />{s}</li>
+          ))}
+        </ul>
+        <a href="#request" className="btn-primary hover:btn-primary-hover w-full mt-2">Заказать</a>
+      </div>
+    </article>
   );
 }
 
