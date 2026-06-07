@@ -128,32 +128,18 @@ function Hero() {
   }, []);
   const next = () => setI((p) => (p + 1) % slides.length);
   const prev = () => setI((p) => (p - 1 + slides.length) % slides.length);
-  const slide = slides[i];
 
   return (
     <section className="relative overflow-hidden">
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-secondary/50 via-background to-background" />
       <div className="max-w-7xl mx-auto px-4 pt-8 sm:pt-12 pb-12 sm:pb-20">
-        <div className="text-center mb-6 sm:mb-10">
-          <span className="inline-block text-xs sm:text-sm font-semibold tracking-wider uppercase text-primary bg-secondary px-3 py-1 rounded-full">
-            Екатеринбург и область
-          </span>
-          <h1 className="mt-3 text-3xl sm:text-5xl lg:text-6xl font-bold max-w-3xl mx-auto">
-            Аренда спецтехники с подачей <span className="text-primary">за час</span>
-          </h1>
-        </div>
 
-        {/* 4 UTP wrapping the slider (grid only on lg+) */}
-        <div className="grid lg:grid-cols-[1fr_minmax(0,2fr)_1fr] gap-6 lg:gap-8 items-stretch">
-          {/* Left column UTPs (top-left, bottom-left) */}
-          <div className="hidden lg:flex flex-col justify-between gap-6">
-            <UtpCard {...utp[0]} align="right" />
-            <UtpCard {...utp[2]} align="right" />
-          </div>
+        {/* Desktop: две колонки. Mobile: стек */}
+        <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-center">
 
-          {/* Slider center */}
-          <div className="relative">
-            <div className="relative aspect-[4/3] sm:aspect-[16/10] rounded-3xl overflow-hidden bg-card shadow-2xl border border-border">
+          {/* Левая колонка — слайдер */}
+          <div className="w-full lg:w-1/2 shrink-0">
+            <div className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-card shadow-2xl border border-border">
               {slides.map((s, idx) => (
                 <div
                   key={s.title}
@@ -169,59 +155,62 @@ function Hero() {
                   />
                   <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 bg-gradient-to-t from-background/95 via-background/80 to-transparent">
                     <div className="flex items-end justify-between gap-3 flex-wrap">
-                      <h3 className="text-xl sm:text-3xl font-bold">{s.title}</h3>
+                      <h3 className="text-xl sm:text-2xl font-bold">{s.title}</h3>
                       <div className="text-right">
-                        <div className="text-xs sm:text-sm text-muted-foreground">Аренда</div>
-                        <div className="text-lg sm:text-2xl font-bold text-primary">{s.price}</div>
+                        <div className="text-xs text-muted-foreground">Аренда</div>
+                        <div className="text-lg sm:text-xl font-bold text-primary">{s.price}</div>
                       </div>
                     </div>
                   </div>
                 </div>
               ))}
-              <button
-                onClick={prev}
-                aria-label="Назад"
-                className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 size-10 sm:size-12 rounded-full bg-background/90 hover:bg-primary hover:text-primary-foreground grid place-items-center shadow-lg transition"
-              >
+              <button onClick={prev} aria-label="Назад"
+                className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 size-10 rounded-full bg-background/90 hover:bg-primary hover:text-primary-foreground grid place-items-center shadow-lg transition">
                 <ChevronLeft className="size-5" />
               </button>
-              <button
-                onClick={next}
-                aria-label="Вперёд"
-                className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 size-10 sm:size-12 rounded-full bg-background/90 hover:bg-primary hover:text-primary-foreground grid place-items-center shadow-lg transition"
-              >
+              <button onClick={next} aria-label="Вперёд"
+                className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 size-10 rounded-full bg-background/90 hover:bg-primary hover:text-primary-foreground grid place-items-center shadow-lg transition">
                 <ChevronRight className="size-5" />
               </button>
             </div>
+            {/* Dots */}
             <div className="mt-4 flex justify-center gap-2">
               {slides.map((_, idx) => (
-                <button
-                  key={idx}
-                  aria-label={`Слайд ${idx + 1}`}
-                  onClick={() => setI(idx)}
-                  className={`h-1.5 rounded-full transition-all ${idx === i ? "w-8 bg-primary" : "w-3 bg-border"}`}
-                />
+                <button key={idx} aria-label={`Слайд ${idx + 1}`} onClick={() => setI(idx)}
+                  className={`h-1.5 rounded-full transition-all ${idx === i ? "w-8 bg-primary" : "w-3 bg-border"}`} />
               ))}
             </div>
-            <div className="mt-5 flex justify-center">
-              <a href="#request" className="btn-primary hover:btn-primary-hover">
-                Заказать {slide.title.toLowerCase()}
+          </div>
+
+          {/* Правая колонка — заголовок, УТП, кнопка */}
+          <div className="w-full lg:w-1/2 flex flex-col gap-6">
+            <div>
+              <span className="inline-block text-xs sm:text-sm font-semibold tracking-wider uppercase text-primary bg-secondary px-3 py-1 rounded-full">
+                Екатеринбург и область
+              </span>
+              <h1 className="mt-3 text-3xl sm:text-4xl lg:text-5xl font-bold">
+                Аренда спецтехники с подачей <span className="text-primary">за час</span>
+              </h1>
+              <p className="mt-3 text-muted-foreground text-base sm:text-lg">
+                Эвакуаторы, манипуляторы, самосвалы и экскаваторы — собственный автопарк без посредников.
+              </p>
+            </div>
+
+            {/* УТП */}
+            <div className="grid grid-cols-2 gap-3">
+              {utp.map((u) => (
+                <UtpCard key={u.title} {...u} compact />
+              ))}
+            </div>
+
+            {/* Кнопка */}
+            <div>
+              <a href="#request" className="btn-primary hover:btn-primary-hover inline-flex">
+                Оставить заявку
               </a>
             </div>
           </div>
 
-          {/* Right column UTPs */}
-          <div className="hidden lg:flex flex-col justify-between gap-6">
-            <UtpCard {...utp[1]} align="left" />
-            <UtpCard {...utp[3]} align="left" />
-          </div>
-        </div>
-
-        {/* UTPs on mobile/tablet — compact grid below */}
-        <div className="grid grid-cols-2 gap-3 mt-8 lg:hidden">
-          {utp.map((u) => (
-            <UtpCard key={u.title} {...u} compact />
-          ))}
         </div>
       </div>
     </section>
