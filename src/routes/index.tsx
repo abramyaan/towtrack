@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import tgIcon from "@/assets/tg.png";
 import maxIcon from "@/assets/max.png";
 import {
@@ -80,6 +80,7 @@ function Index() {
       <Header />
       <Hero />
       <Catalog />
+      <PhotoGrid />
       <About />
       <PriceList />
       <RequestForm />
@@ -184,31 +185,27 @@ function Hero() {
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-secondary/50 via-background to-background" />
       <div className="max-w-7xl mx-auto px-4 pt-8 sm:pt-12 pb-12 sm:pb-20">
 
-        {/* Desktop: две колонки. Mobile: стек */}
+        {/* Мобилка: заголовок сверху по центру */}
+        <div className="lg:hidden text-center mb-6">
+          <h1 className="text-3xl sm:text-4xl font-bold">Аренда спецтехники</h1>
+          <p className="mt-1 text-lg font-semibold text-primary">Екатеринбург и область</p>
+        </div>
+
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-center">
 
-          {/* Левая колонка — слайдер */}
-          <div className="w-full lg:w-1/2 shrink-0">
+          {/* Слайдер */}
+          <div className="w-full lg:w-2/3 shrink-0">
             <div className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-card shadow-2xl border border-border">
               {slides.map((s, idx) => (
-                <div
-                  key={s.title}
-                  className={`absolute inset-0 transition-opacity duration-700 ${idx === i ? "opacity-100" : "opacity-0"}`}
-                >
-                  <img
-                    src={s.image}
-                    alt={s.title}
-                    width={1280}
-                    height={896}
-                    loading={idx === 0 ? "eager" : "lazy"}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 bg-gradient-to-t from-background/95 via-background/80 to-transparent">
+                <div key={s.title} className={`absolute inset-0 transition-opacity duration-700 ${idx === i ? "opacity-100" : "opacity-0"}`}>
+                  <img src={s.image} alt={s.title} width={1280} height={896}
+                    loading={idx === 0 ? "eager" : "lazy"} className="w-full h-full object-cover" />
+                  <div className="absolute inset-x-0 bottom-0 p-4 sm:p-8 bg-gradient-to-t from-background/95 via-background/80 to-transparent">
                     <div className="flex items-end justify-between gap-3 flex-wrap">
-                      <h3 className="text-xl sm:text-2xl font-bold">{s.title}</h3>
+                      <h3 className="text-xl sm:text-2xl lg:text-4xl font-bold">{s.title}</h3>
                       <div className="text-right">
                         <div className="text-xs text-muted-foreground">Аренда</div>
-                        <div className="text-lg sm:text-xl font-bold text-primary">{s.price}</div>
+                        <div className="text-lg sm:text-xl lg:text-3xl font-bold text-primary">{s.price}</div>
                       </div>
                     </div>
                   </div>
@@ -223,7 +220,6 @@ function Hero() {
                 <ChevronRight className="size-5" />
               </button>
             </div>
-            {/* Dots */}
             <div className="mt-4 flex justify-center gap-2">
               {slides.map((_, idx) => (
                 <button key={idx} aria-label={`Слайд ${idx + 1}`} onClick={() => setI(idx)}
@@ -232,35 +228,34 @@ function Hero() {
             </div>
           </div>
 
-          {/* Правая колонка — заголовок, УТП, кнопка */}
-          <div className="w-full lg:w-1/2 flex flex-col gap-6">
+          {/* Правая колонка — только десктоп */}
+          <div className="hidden lg:flex w-1/3 flex-col gap-6">
             <div>
-              <div className="text-center lg:text-center">
-                <span className="inline-block text-xs sm:text-sm font-semibold tracking-wider uppercase text-primary bg-secondary px-3 py-1 rounded-full">
-                  Екатеринбург и область
-                </span>
-              </div>
-              <h1 className="mt-3 text-3xl sm:text-4xl lg:text-5xl font-bold">
-                Аренда спецтехники с подачей <span className="text-primary">за час</span>
-              </h1>
-              <p className="mt-3 text-muted-foreground text-base sm:text-lg">
+              <h1 className="text-4xl lg:text-5xl font-bold">Аренда спецтехники</h1>
+              <p className="mt-2 text-xl font-semibold text-primary">Екатеринбург и область</p>
+              <p className="mt-3 text-muted-foreground text-lg">
                 Эвакуаторы, манипуляторы, самосвалы и экскаваторы — собственный автопарк без посредников.
               </p>
             </div>
-
-            {/* УТП */}
             <div className="grid grid-cols-2 gap-3">
-              {utp.map((u) => (
-                <UtpCard key={u.title} {...u} compact />
-              ))}
+              {utp.map((u) => <UtpCard key={u.title} {...u} compact />)}
             </div>
+            <a href="#request" className="btn-primary hover:btn-primary-hover inline-flex text-lg px-10 py-5 self-center">
+              Оставить заявку
+            </a>
+          </div>
 
-            {/* Кнопка */}
-            <div>
-              <a href="#request" className="btn-primary hover:btn-primary-hover inline-flex">
-                Оставить заявку
-              </a>
+          {/* Мобилка: после слайдера */}
+          <div className="w-full lg:hidden flex flex-col gap-4">
+            <p className="text-center text-muted-foreground text-base">
+              Эвакуаторы, манипуляторы, самосвалы и экскаваторы — собственный автопарк без посредников.
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              {utp.map((u) => <UtpCard key={u.title} {...u} compact />)}
             </div>
+            <a href="#request" className="btn-primary hover:btn-primary-hover inline-flex text-base px-8 py-4 self-center">
+              Оставить заявку
+            </a>
           </div>
 
         </div>
@@ -270,19 +265,16 @@ function Hero() {
 }
 
 function UtpCard({
-  icon: Icon, title, text, align = "left", compact = false,
+  icon: Icon, title, align = "left", compact = false,
 }: {
   icon: typeof Award; title: string; text: string; align?: "left" | "right"; compact?: boolean;
 }) {
   return (
-    <div className={`bg-card border border-border rounded-2xl p-4 sm:p-5 shadow-sm flex gap-3 ${align === "right" ? "lg:flex-row-reverse lg:text-right" : ""}`}>
+    <div className={`bg-card border border-border rounded-2xl p-4 sm:p-5 shadow-sm flex gap-3 items-center ${align === "right" ? "lg:flex-row-reverse lg:text-right" : ""}`}>
       <div className="shrink-0 size-10 sm:size-11 rounded-xl bg-secondary text-primary grid place-items-center">
         <Icon className="size-5" />
       </div>
-      <div>
-        <div className={`font-bold ${compact ? "text-sm" : "text-base sm:text-lg"}`}>{title}</div>
-        <div className={`text-muted-foreground ${compact ? "text-xs mt-0.5" : "text-sm mt-1"}`}>{text}</div>
-      </div>
+      <div className={`font-bold ${compact ? "text-sm" : "text-base sm:text-lg"}`}>{title}</div>
     </div>
   );
 }
@@ -292,7 +284,7 @@ function Catalog() {
     <section id="catalog" className="py-16 sm:py-24 bg-background">
       <div className="max-w-7xl mx-auto px-4">
         <SectionHead kicker="Каталог" title="Спецтехника в аренду" subtitle="Современный автопарк. Опытные операторы. Работаем по Екатеринбургу и всей Свердловской области." />
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
           {catalog.map((c) => (
             <CatalogCard key={c.title} {...c} />
           ))}
@@ -314,7 +306,9 @@ function CatalogCard({ title, images, price, specs }: {
 
   return (
     <article className="group bg-card border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition flex flex-col">
-      <div className="relative aspect-[4/3] bg-secondary/40 overflow-hidden">
+
+      {/* Фото сверху на всю ширину */}
+      <div className="relative w-full aspect-[16/9] bg-secondary/40 overflow-hidden">
         {images.map((src, i) => (
           <img
             key={i}
@@ -326,41 +320,65 @@ function CatalogCard({ title, images, price, specs }: {
         ))}
         {images.length > 1 && (
           <>
-            <button
-              onClick={(e) => { e.preventDefault(); prev(); }}
-              className="absolute left-1.5 top-1/2 -translate-y-1/2 size-7 rounded-full bg-background/80 hover:bg-background grid place-items-center shadow transition"
-            >
-              <ChevronLeft className="size-4" />
+            <button onClick={(e) => { e.preventDefault(); prev(); }}
+              className="absolute left-2 top-1/2 -translate-y-1/2 size-8 rounded-full bg-background/80 hover:bg-background grid place-items-center shadow transition">
+              <ChevronLeft className="size-5" />
             </button>
-            <button
-              onClick={(e) => { e.preventDefault(); next(); }}
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 size-7 rounded-full bg-background/80 hover:bg-background grid place-items-center shadow transition"
-            >
-              <ChevronRight className="size-4" />
+            <button onClick={(e) => { e.preventDefault(); next(); }}
+              className="absolute right-2 top-1/2 -translate-y-1/2 size-8 rounded-full bg-background/80 hover:bg-background grid place-items-center shadow transition">
+              <ChevronRight className="size-5" />
             </button>
             <div className="absolute bottom-2 inset-x-0 flex justify-center gap-1">
               {images.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={(e) => { e.preventDefault(); setIdx(i); }}
-                  className={`h-1 rounded-full transition-all ${i === idx ? "w-5 bg-white" : "w-2 bg-white/50"}`}
-                />
+                <button key={i} onClick={(e) => { e.preventDefault(); setIdx(i); }}
+                  className={`h-1 rounded-full transition-all ${i === idx ? "w-5 bg-white" : "w-2 bg-white/50"}`} />
               ))}
             </div>
           </>
         )}
       </div>
-      <div className="p-5 flex flex-col gap-3 flex-1">
-        <h3 className="text-xl font-bold">{title}</h3>
-        <div className="text-2xl font-bold text-primary">{price}</div>
-        <ul className="space-y-1.5 text-sm text-muted-foreground flex-1">
+
+      {/* Текст снизу */}
+      <div className="p-5 sm:p-6 flex flex-col gap-3 flex-1">
+        <h3 className="text-xl sm:text-2xl font-bold">{title}</h3>
+        <div className="text-2xl sm:text-3xl font-bold text-primary">{price}</div>
+        <ul className="space-y-1.5 text-sm sm:text-base text-muted-foreground flex-1">
           {specs.map((s) => (
-            <li key={s} className="flex gap-2"><Check className="size-4 text-primary shrink-0 mt-0.5" />{s}</li>
+            <li key={s} className="flex gap-2">
+              <Check className="size-4 text-primary shrink-0 mt-0.5" />{s}
+            </li>
           ))}
         </ul>
-        <a href="#request" className="btn-primary hover:btn-primary-hover w-full mt-2">Заказать</a>
+        <a href="#request" className="btn-primary hover:btn-primary-hover w-full mt-2">
+          Оставить заявку
+        </a>
       </div>
+
     </article>
+  );
+}
+const photoGrid = [
+  evacuator, manipulator, samosval, excavator,
+  evacuator, manipulator, samosval, excavator,
+  evacuator, manipulator, samosval, excavator,
+];
+
+function PhotoGrid() {
+  return (
+    <section className="py-12 sm:py-16">
+      <div className="grid grid-cols-2 lg:grid-cols-4">
+        {photoGrid.map((src, i) => (
+          <div key={i} className="aspect-[4/3] overflow-hidden">
+            <img
+              src={src}
+              alt={`Техника ${i + 1}`}
+              loading="lazy"
+              className="w-full h-full object-cover hover:scale-105 transition duration-300 cursor-zoom-in"
+            />
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -374,7 +392,7 @@ function About() {
     "Установка и перемещение оборудования, погрузо-разгрузочные работы на стройплощадке.",
   ];
   return (
-    <section id="about" className="py-16 sm:py-24 bg-secondary/40">
+    <section id="about" className="py-16 sm:py-24 bg-background">
       <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
         <div>
           <SectionHead kicker="Для чего" title="Что мы делаем на наших манипуляторах и спецтехнике" align="left" />
