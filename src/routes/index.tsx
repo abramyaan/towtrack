@@ -463,50 +463,76 @@ function RequestForm() {
   };
 
   return (
-    <section id="request" className="py-16 sm:py-24 bg-secondary/40">
-      <div className="max-w-3xl mx-auto px-4">
-        <SectionHead kicker="Заявка" title="Оставьте заявку — перезвоним за 15 минут" />
+    <section id="request" className="relative overflow-hidden">
+      {/* Фон */}
+      <img src={evacuator} alt="" className="absolute inset-0 w-full h-full object-cover" />
+      <div className="absolute inset-0 bg-black/70" />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 sm:py-24 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+
+        {/* Левая часть — текст */}
+        <div className="text-white">
+          <span className="inline-block text-xs font-semibold tracking-wider uppercase text-primary bg-white/10 px-3 py-1 rounded-full">
+            Заявка
+          </span>
+          <h2 className="mt-4 text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
+            Предварительный заказ спецтехники и эвакуатора
+          </h2>
+          <p className="mt-4 text-white/70 text-base sm:text-lg leading-relaxed">
+            Вы можете оставить заявку на запланированную дату и рассчитать стоимость с оператором.
+          </p>
+          <div className="mt-8 flex flex-col gap-3">
+            <a href="tel:+79655067816" className="flex items-center gap-3 text-white hover:text-primary transition">
+              <Phone className="size-5 shrink-0" />
+              <span className="text-lg font-semibold">+7 (965) 506-78-16</span>
+            </a>
+          </div>
+        </div>
+
+        {/* Правая часть — форма */}
         <form
           onSubmit={handleSubmit}
-          className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-sm grid gap-4"
+          className="bg-white/10 backdrop-blur border border-white/20 rounded-2xl p-6 sm:p-8 grid gap-4"
         >
           <div className="grid sm:grid-cols-2 gap-4">
-            <Field label="Ваше имя" name="name" placeholder="Иван" required />
             <div className="grid">
-              <label className="text-sm font-semibold mb-1.5">
+              <label className="text-sm font-semibold mb-1.5 text-white">Ваше имя</label>
+              <input name="name" placeholder="Иван" required
+                className="bg-white/10 border border-white/30 rounded-lg px-3 py-3 outline-none focus:ring-2 focus:ring-primary text-white placeholder:text-white/50" />
+            </div>
+            <div className="grid">
+              <label className="text-sm font-semibold mb-1.5 text-white">
                 Телефон <span className="text-primary">*</span>
               </label>
               <input
-                name="phone"
-                type="tel"
-                placeholder="+7"
-                value={phone}
-                onChange={handlePhone}
-                required
-                className={`bg-background border rounded-lg px-3 py-3 outline-none focus:ring-2 focus:ring-ring ${phoneError ? "border-destructive" : "border-input"}`}
+                name="phone" type="tel" placeholder="+7"
+                value={phone} onChange={handlePhone} required
+                className={`bg-white/10 border rounded-lg px-3 py-3 outline-none focus:ring-2 focus:ring-primary text-white placeholder:text-white/50 ${phoneError ? "border-red-400" : "border-white/30"}`}
               />
-              {phoneError && <p className="text-xs text-destructive mt-1">{phoneError}</p>}
+              {phoneError && <p className="text-xs text-red-400 mt-1">{phoneError}</p>}
             </div>
           </div>
           <div className="grid">
-            <label className="text-sm font-semibold mb-1.5">Какая техника нужна</label>
-            <select name="service" className="bg-background border border-input rounded-lg px-3 py-3 outline-none focus:ring-2 focus:ring-ring">
-              {slides.map((s) => <option key={s.title}>{s.title}</option>)}
-              <option>Не знаю — нужна консультация</option>
+            <label className="text-sm font-semibold mb-1.5 text-white">Какая техника нужна</label>
+            <select name="service"
+              className="bg-white/10 border border-white/30 rounded-lg px-3 py-3 outline-none focus:ring-2 focus:ring-primary text-white">
+              {slides.map((s) => <option key={s.title} className="text-black">{s.title}</option>)}
+              <option className="text-black">Не знаю — нужна консультация</option>
             </select>
           </div>
           <div className="grid">
-            <label className="text-sm font-semibold mb-1.5">Комментарий</label>
+            <label className="text-sm font-semibold mb-1.5 text-white">Комментарий</label>
             <textarea name="comment" rows={3} placeholder="Адрес, дата, что нужно сделать (необязательно)"
-                      className="bg-background border border-input rounded-lg px-3 py-3 outline-none focus:ring-2 focus:ring-ring" />
+              className="bg-white/10 border border-white/30 rounded-lg px-3 py-3 outline-none focus:ring-2 focus:ring-primary text-white placeholder:text-white/50" />
           </div>
           <button type="submit" className="btn-primary hover:btn-primary-hover justify-self-start">
             {sent ? "Заявка отправлена ✓" : "Отправить заявку"}
           </button>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-white/50">
             Нажимая «Отправить», вы соглашаетесь на обработку персональных данных.
           </p>
         </form>
+
       </div>
     </section>
   );
