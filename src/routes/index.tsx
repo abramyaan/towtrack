@@ -11,7 +11,18 @@ import evacuator from "@/assets/evacu.jpeg";
 import manipulator from "@/assets/manip.jpg";
 import samosval from "@/assets/samosvalo.jpeg";
 import excavator from "@/assets/exka.jpg";
-
+import img1990 from "@/assets/IMG_1990.jpeg";
+import img2165 from "@/assets/IMG_2165.jpeg";
+import img2501 from "@/assets/IMG_2501.jpeg";
+import img2816 from "@/assets/IMG_2816.jpeg";
+import img2971 from "@/assets/IMG_2971.jpeg";
+import img3410 from "@/assets/IMG_3410.jpeg";
+import img3455 from "@/assets/IMG_3455.jpeg";
+import manipulatorPhoto from "@/assets/манипулятор.jpeg";
+import specavto from "@/assets/спецавто.webp";
+import specavto1 from "@/assets/спецавто1.webp";
+import specavto2 from "@/assets/спецавто2.webp";
+import excavatorPhoto from "@/assets/экскаватор.jpeg";
 export const Route = createFileRoute("/")({
   component: Index,
 });
@@ -358,26 +369,50 @@ function CatalogCard({ title, images, price, specs }: {
   );
 }
 const photoGrid = [
-  evacuator, manipulator, samosval, excavator,
-  evacuator, manipulator, samosval, excavator,
-  evacuator, manipulator, samosval, excavator,
+  evacuator, manipulatorPhoto, specavto, excavatorPhoto,
+  img1990, img2165, img2501, img2816,
+  img2971, img3410, img3455, specavto1,
 ];
 
 function PhotoGrid() {
+  const [selected, setSelected] = useState<string | null>(null);
+
   return (
     <section className="py-12 sm:py-16">
       <div className="grid grid-cols-2 lg:grid-cols-4">
         {photoGrid.map((src, i) => (
-          <div key={i} className="aspect-[4/3] overflow-hidden">
+          <div key={i} className="aspect-[4/3] overflow-hidden cursor-zoom-in"
+            onClick={() => setSelected(src)}>
             <img
               src={src}
               alt={`Техника ${i + 1}`}
               loading="lazy"
-              className="w-full h-full object-cover hover:scale-105 transition duration-300 cursor-zoom-in"
+              className="w-full h-full object-cover hover:scale-105 transition duration-300"
             />
           </div>
         ))}
       </div>
+
+      {/* Лайтбокс */}
+      {selected && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setSelected(null)}
+        >
+          <button
+            onClick={() => setSelected(null)}
+            className="absolute top-4 right-4 size-10 rounded-full bg-white/10 hover:bg-white/20 grid place-items-center text-white transition"
+          >
+            <X className="size-6" />
+          </button>
+          <img
+            src={selected}
+            alt="Фото"
+            className="max-w-full max-h-[90vh] object-contain rounded-xl"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </section>
   );
 }
