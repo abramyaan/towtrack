@@ -49,7 +49,7 @@ const slides: Slide[] = [
   { title: "Манипулятор", image: manipulator, price: "от 2 500 ₽/час", href: "#catalog" },
   { title: "Мини самосвал", image: samosval, price: "от 2 200 ₽/час", href: "#catalog" },
   { title: "Мини экскаватор", image: excavator, price: "от 2 800 ₽/час", href: "#catalog" },
-  { title: "Мини экскаватор", image: excavator, price: "от 2 800 ₽/час", href: "#catalog" },
+  { title: "Спецтехника для бурения", image: bur2, price: "от 2 500 ₽/час", href: "#catalog" },
 ];
 
 const utp = [
