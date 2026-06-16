@@ -506,21 +506,23 @@ function RequestForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
     const digits = phone.replace(/\D/g, "");
     if (digits.length !== 11) {
       setPhoneError("Введите корректный номер (11 цифр)");
       return;
     }
 
-    // Собираем данные из полей формы
     const formData = new FormData(e.currentTarget);
     const name = formData.get("name") as string;
     const service = formData.get("service") as string;
     const comment = formData.get("comment") as string;
 
     try {
-      // Стучимся на твой Cloudflare Worker вместо прямого Telegram API
-      const response = await fetch("https://tow-track-api.billionaiero56.workers.dev", {
+      const targetUrl = "https://tow-track-api.billionaiero56.workers.dev/";
+      
+      // Используем стабильный CORS-прокси, который склеивает запрос и обходит блокировку *.workers.dev в РФ
+      const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(targetUrl)}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -529,15 +531,15 @@ function RequestForm() {
       });
 
       if (!response.ok) {
-        throw new Error("Ошибка при отправке через Cloudflare");
+        throw new Error("Ошибка при ответе сервера через прокси");
       }
 
-      // После успешной отправки редиректим на страницу спасибо:
+      // Перенаправляем на страницу «Спасибо» при успешной отправке
       navigate({ to: "/spasibo" });
     } catch (error) {
-      console.error("Не удалось отправить заявку через Воркер:", error);
-      // Если сеть моргнула или прокси сбоит, всё равно пускаем юзера на страницу спасибо,
-      // чтобы не ломать UX и он думал, что менеджер свяжется с ним.
+      console.error("Не удалось отправить заявку:", error);
+      // В случае любой ошибки сети всё равно уводим пользователя на страницу «Спасибо»,
+      // чтобы не ломать ему UX, но логируем проблему
       navigate({ to: "/spasibo" });
     }
   };
