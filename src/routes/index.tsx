@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import tgIcon from "@/assets/tg.png";
 import maxIcon from "@/assets/max.png";
@@ -8,9 +8,18 @@ import {
 } from "lucide-react";
 
 import evacuator from "@/assets/evacu.jpeg";
+import evacuator2 from "@/assets/evac2.jpg";
+import evacuator3 from "@/assets/evac3.jpg";
 import manipulator from "@/assets/manip.jpg";
+import manipulator2 from "@/assets/manip2.jpg";
+import bur1 from "@/assets/bur1.jpg";
+import bur2 from "@/assets/bur2.jpg";
 import samosval from "@/assets/samosvalo.jpeg";
+import samosval2 from "@/assets/samosval2.jpg";
+import samosval3 from "@/assets/samosval3.jpg";
 import excavator from "@/assets/exka.jpg";
+import excavator2 from "@/assets/exka2.jpg";
+import excavator3 from "@/assets/exka3.jpg";
 import img1990 from "@/assets/IMG_1990.jpeg";
 import img2165 from "@/assets/IMG_2165.jpeg";
 import img2501 from "@/assets/IMG_2501.jpeg";
@@ -23,6 +32,7 @@ import specavto from "@/assets/спецавто.webp";
 import specavto1 from "@/assets/спецавто1.webp";
 import specavto2 from "@/assets/спецавто2.webp";
 import excavatorPhoto from "@/assets/экскаватор.jpeg";
+
 export const Route = createFileRoute("/")({
   component: Index,
 });
@@ -39,6 +49,7 @@ const slides: Slide[] = [
   { title: "Манипулятор", image: manipulator, price: "от 2 500 ₽/час", href: "#catalog" },
   { title: "Мини самосвал", image: samosval, price: "от 2 200 ₽/час", href: "#catalog" },
   { title: "Мини экскаватор", image: excavator, price: "от 2 800 ₽/час", href: "#catalog" },
+  { title: "Мини экскаватор", image: excavator, price: "от 2 800 ₽/час", href: "#catalog" },
 ];
 
 const utp = [
@@ -51,27 +62,33 @@ const utp = [
 const catalog = [
   {
     title: "Эвакуатор",
-    images: [evacuator, evacuator, evacuator],
+    images: [evacuator, evacuator2, evacuator3],
     price: "от 2 000 ₽/час",
     specs: ["Грузоподъёмность до 5 т", "Платформа 5,5 м", "Лебёдка 5 т", "Полная и частичная погрузка"],
   },
   {
     title: "Манипулятор",
-    images: [manipulator, manipulator, manipulator],
+    images: [manipulator, manipulator2],
     price: "от 2 500 ₽/час",
     specs: ["Стрела до 7 т / 20 м", "Кузов 6,2 × 2,4 м", "Грузоподъёмность борта 10 т", "Работа с длинномерами"],
   },
   {
     title: "Мини самосвал",
-    images: [samosval, samosval],
+    images: [samosval, samosval2, samosval3],
     price: "от 2 200 ₽/час",
     specs: ["Объём кузова до 6 м³", "Грузоподъёмность 5 т", "Самосвальная разгрузка", "Сыпучие и строй-мусор"],
   },
   {
     title: "Мини экскаватор",
-    images: [excavator, excavator],
+    images: [excavator, excavator2, excavator3],
     price: "от 2 800 ₽/час",
     specs: ["Глубина копания 3 м", "Ширина 1,5 м (узкие места)", "Сменные ковши", "Для частных и стройплощадок"],
+  },
+  {
+    title: "Спецтехника для бурения",
+    images: [bur1, bur2],
+    price: "от 2 500 ₽/час",
+    specs: ["Глубина копания 5 м", "Ширина 1,5 м (узкие места)", "Сменные ковши", "Для частных и стройплощадок"],
   },
 ];
 
@@ -473,7 +490,7 @@ function PriceList() {
 }
 
 function RequestForm() {
-  const [sent, setSent] = useState(false);
+  const navigate = useNavigate(); // Инициализируем навигацию
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
 
@@ -487,14 +504,60 @@ function RequestForm() {
     setPhoneError("");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const digits = phone.replace(/\D/g, "");
     if (digits.length !== 11) {
       setPhoneError("Введите корректный номер (11 цифр)");
       return;
     }
-    setSent(true);
+
+    // Собираем данные из полей формы
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+    const service = formData.get("service") as string;
+    const comment = formData.get("comment") as string;
+
+    // Константы твоего телеграм-бота
+    const TELEGRAM_BOT_TOKEN = "8690752748:AAE3V_iR68Ys6iKRYcD7Rcw9nTFvGaZqXgk";
+    const TELEGRAM_CHAT_ID = "-5497763573";
+
+    // Красиво форматируем текст сообщения для группы (Markdown)
+    const text = `
+🚨 *Новая заявка на спецтехнику!*
+
+👤 *Имя:* ${name}
+📞 *Телефон:* [${phone}](tel:${phone})
+🚜 *Техника:* ${service}
+📝 *Комментарий:* ${comment || "Не указан"}
+    `.trim();
+
+    try {
+      // Отправляем запрос в Telegram API
+      const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: text,
+          parse_mode: "Markdown",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Ошибка при отправке в Telegram");
+      }
+
+      // После успешной отправки редиректим на страницу спасибо:
+      navigate({ to: "/spasibo" });
+    } catch (error) {
+      console.error("Не удалось отправить заявку в ТГ:", error);
+      // Если ТГ упал, всё равно пускаем юзера на страницу спасибо, чтобы не пугать ошибками,
+      // но в консоль пишем лог. Либо можешь вывести alert.
+      navigate({ to: "/spasibo" });
+    }
   };
 
   return (
@@ -561,7 +624,7 @@ function RequestForm() {
               className="bg-white/10 border border-white/30 rounded-lg px-3 py-3 outline-none focus:ring-2 focus:ring-primary text-white placeholder:text-white/50" />
           </div>
           <button type="submit" className="btn-primary hover:btn-primary-hover justify-self-start">
-            {sent ? "Заявка отправлена ✓" : "Отправить заявку"}
+            Отправить заявку
           </button>
           <p className="text-xs text-white/50">
             Нажимая «Отправить», вы соглашаетесь на обработку персональных данных.
@@ -632,3 +695,5 @@ function SectionHead({ kicker, title, subtitle, align = "center" }:
     </div>
   );
 }
+
+ 
