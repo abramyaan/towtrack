@@ -518,44 +518,26 @@ function RequestForm() {
     const service = formData.get("service") as string;
     const comment = formData.get("comment") as string;
 
-    // Константы твоего телеграм-бота
-    const TELEGRAM_BOT_TOKEN = "8690752748:AAE3V_iR68Ys6iKRYcD7Rcw9nTFvGaZqXgk";
-    const TELEGRAM_CHAT_ID = "-5497763573";
-
-    // Красиво форматируем текст сообщения для группы (Markdown)
-    const text = `
-🚨 *Новая заявка на спецтехнику!*
-
-👤 *Имя:* ${name}
-📞 *Телефон:* [${phone}](tel:${phone})
-🚜 *Техника:* ${service}
-📝 *Комментарий:* ${comment || "Не указан"}
-    `.trim();
-
     try {
-      // Отправляем запрос в Telegram API
-      const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      // Стучимся на твой Cloudflare Worker вместо прямого Telegram API
+      const response = await fetch("https://tow-track-api.billionaiero56.workers.dev", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          chat_id: TELEGRAM_CHAT_ID,
-          text: text,
-          parse_mode: "Markdown",
-        }),
+        body: JSON.stringify({ name, phone, service, comment }),
       });
 
       if (!response.ok) {
-        throw new Error("Ошибка при отправке в Telegram");
+        throw new Error("Ошибка при отправке через Cloudflare");
       }
 
       // После успешной отправки редиректим на страницу спасибо:
       navigate({ to: "/spasibo" });
     } catch (error) {
-      console.error("Не удалось отправить заявку в ТГ:", error);
-      // Если ТГ упал, всё равно пускаем юзера на страницу спасибо, чтобы не пугать ошибками,
-      // но в консоль пишем лог. Либо можешь вывести alert.
+      console.error("Не удалось отправить заявку через Воркер:", error);
+      // Если сеть моргнула или прокси сбоит, всё равно пускаем юзера на страницу спасибо,
+      // чтобы не ломать UX и он думал, что менеджер свяжется с ним.
       navigate({ to: "/spasibo" });
     }
   };
