@@ -527,7 +527,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   try {
     const result = await emailjs.send(
       "service_0ue7ocr",
-      "template_l08cbdf",
+      "template_4bosqlk",
       { name, phone, service, comment },
       "Uh9C9nFoNQEKPdprw"
     );
