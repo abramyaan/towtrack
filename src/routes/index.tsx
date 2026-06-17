@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import emailjs from "@emailjs/browser";
 import { useEffect, useState } from "react";
 import tgIcon from "@/assets/tg.png";
 import maxIcon from "@/assets/max.png";
@@ -504,45 +505,42 @@ function RequestForm() {
     setPhoneError("");
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    
-    const digits = phone.replace(/\D/g, "");
-    if (digits.length !== 11) {
-      setPhoneError("Введите корректный номер (11 цифр)");
-      return;
-    }
+  const [isLoading, setIsLoading] = useState(false);
 
-    const formData = new FormData(e.currentTarget);
-    const name = formData.get("name") as string;
-    const service = formData.get("service") as string;
-    const comment = formData.get("comment") as string;
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
 
-    try {
-      const targetUrl = "https://tow-track-api.billionaiero56.workers.dev/";
-      
-      // Используем стабильный CORS-прокси, который склеивает запрос и обходит блокировку *.workers.dev в РФ
-      const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(targetUrl)}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, phone, service, comment }),
-      });
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length !== 11) {
+    setPhoneError("Введите корректный номер (11 цифр)");
+    return;
+  }
 
-      if (!response.ok) {
-        throw new Error("Ошибка при ответе сервера через прокси");
-      }
+  const formData = new FormData(e.currentTarget);
+  const name = formData.get("name") as string;
+  const service = formData.get("service") as string;
+  const comment = formData.get("comment") as string;
 
-      // Перенаправляем на страницу «Спасибо» при успешной отправке
-      navigate({ to: "/spasibo" });
-    } catch (error) {
-      console.error("Не удалось отправить заявку:", error);
-      // В случае любой ошибки сети всё равно уводим пользователя на страницу «Спасибо»,
-      // чтобы не ломать ему UX, но логируем проблему
-      navigate({ to: "/spasibo" });
-    }
-  };
+  setIsLoading(true);
+  console.log("📤 Отправка заявки...", { name, phone, service, comment });
+
+  try {
+    const result = await emailjs.send(
+      "service_iloay11",
+      "template_l08cbdf",
+      { name, phone, service, comment },
+      "Uh9C9nFoNQEKPdprw"
+    );
+
+    console.log("✅ Успешно отправлено:", result.status, result.text);
+    navigate({ to: "/spasibo" });
+  } catch (error) {
+    console.error("❌ Ошибка отправки:", error);
+    navigate({ to: "/spasibo" });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <section id="request" className="relative overflow-hidden">
@@ -607,9 +605,9 @@ function RequestForm() {
             <textarea name="comment" rows={3} placeholder="Адрес, дата, что нужно сделать (необязательно)"
               className="bg-white/10 border border-white/30 rounded-lg px-3 py-3 outline-none focus:ring-2 focus:ring-primary text-white placeholder:text-white/50" />
           </div>
-          <button type="submit" className="btn-primary hover:btn-primary-hover justify-self-start">
-            Отправить заявку
-          </button>
+          <button type="submit" disabled={isLoading} className="btn-primary hover:btn-primary-hover justify-self-start">
+  {isLoading ? "Отправка..." : "Отправить заявку"}
+</button>
           <p className="text-xs text-white/50">
             Нажимая «Отправить», вы соглашаетесь на обработку персональных данных.
           </p>
