@@ -31,7 +31,6 @@ import img3455 from "@/assets/IMG_3455.jpeg";
 import manipulatorPhoto from "@/assets/манипулятор.jpeg";
 import specavto from "@/assets/спецавто.webp";
 import specavto1 from "@/assets/спецавто1.webp";
-import specavto2 from "@/assets/спецавто2.webp";
 import excavatorPhoto from "@/assets/экскаватор.jpeg";
 
 export const Route = createFileRoute("/")({
@@ -133,6 +132,26 @@ export default Index;
 function Header() {
   const [open, setOpen] = useState(false);
 
+  // Блокируем скролл страницы, пока открыто мобильное меню
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
+
+  // Закрываем мобильное меню и только после этого скроллим к разделу.
+  // Если скроллить и закрывать меню одновременно, браузер считает позицию
+  // якоря по "старой" высоте страницы (с открытым меню) — отсюда промах
+  // при первом клике и нормальный скролл только со второго раза.
+  const handleMobileNav = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    setOpen(false);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.querySelector(href)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+  };
+
   return (
     <header className="sticky top-0 z-40 backdrop-blur bg-background/85 border-b border-border">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
@@ -187,11 +206,11 @@ function Header() {
       {/* Mobile menu */}
       {open && (
         <div className="md:hidden border-t border-border bg-background/95 backdrop-blur px-4 py-4 flex flex-col gap-3">
-          <a href="#catalog" onClick={() => setOpen(false)} className="text-sm font-medium hover:text-primary py-2">Каталог</a>
-          <a href="#about" onClick={() => setOpen(false)} className="text-sm font-medium hover:text-primary py-2">Услуги</a>
-          <a href="#price" onClick={() => setOpen(false)} className="text-sm font-medium hover:text-primary py-2">Цены</a>
-          <a href="#contacts" onClick={() => setOpen(false)} className="text-sm font-medium hover:text-primary py-2">Контакты</a>
-          <a href="#request" onClick={() => setOpen(false)} className="btn-primary hover:btn-primary-hover w-full mt-1">
+          <a href="#catalog" onClick={(e) => handleMobileNav(e, "#catalog")} className="text-sm font-medium hover:text-primary py-2">Каталог</a>
+          <a href="#about" onClick={(e) => handleMobileNav(e, "#about")} className="text-sm font-medium hover:text-primary py-2">Услуги</a>
+          <a href="#price" onClick={(e) => handleMobileNav(e, "#price")} className="text-sm font-medium hover:text-primary py-2">Цены</a>
+          <a href="#contacts" onClick={(e) => handleMobileNav(e, "#contacts")} className="text-sm font-medium hover:text-primary py-2">Контакты</a>
+          <a href="#request" onClick={(e) => handleMobileNav(e, "#request")} className="btn-primary hover:btn-primary-hover w-full mt-1">
             Оставить заявку
           </a>
         </div>
@@ -202,10 +221,12 @@ function Header() {
 
 function Hero() {
   const [i, setI] = useState(0);
+
   useEffect(() => {
     const t = setInterval(() => setI((p) => (p + 1) % slides.length), 5000);
     return () => clearInterval(t);
-  }, []);
+  }, [i]); // переотсчёт таймера после любого ручного переключения слайда
+
   const next = () => setI((p) => (p + 1) % slides.length);
   const prev = () => setI((p) => (p - 1 + slides.length) % slides.length);
 
@@ -228,7 +249,7 @@ function Hero() {
               {slides.map((s, idx) => (
                 <div key={s.title} className={`absolute inset-0 transition-opacity duration-700 ${idx === i ? "opacity-100" : "opacity-0"}`}>
                   <img src={s.image} alt={s.title} width={1280} height={896}
-                    loading={idx === 0 ? "eager" : "lazy"} className="w-full h-full object-cover" />
+                    loading={idx === 0 ? "eager" : "lazy"} decoding="async" className="w-full h-full object-cover" />
                   <div className="absolute inset-x-0 bottom-0 p-4 sm:p-8 bg-gradient-to-t from-background/95 via-background/80 to-transparent">
                     <div className="flex items-end justify-between gap-3 flex-wrap">
                       <h3 className="text-xl sm:text-2xl lg:text-4xl font-bold">{s.title}</h3>
@@ -310,7 +331,7 @@ function UtpCard({
 
 function Catalog() {
   return (
-    <section id="catalog" className="py-16 sm:py-24 bg-background">
+    <section id="catalog" className="py-16 sm:py-24 bg-background scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4">
         <SectionHead kicker="Каталог" title="Спецтехника в аренду" subtitle="Современный автопарк. Опытные операторы. Работаем по Екатеринбургу и всей Свердловской области." />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
@@ -343,7 +364,10 @@ function CatalogCard({ title, images, price, specs }: {
             key={i}
             src={src}
             alt={`${title} ${i + 1}`}
+            width={800}
+            height={450}
             loading="lazy"
+            decoding="async"
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${i === idx ? "opacity-100" : "opacity-0"}`}
           />
         ))}
@@ -395,6 +419,18 @@ const photoGrid = [
 function PhotoGrid() {
   const [selected, setSelected] = useState<string | null>(null);
 
+  // Блокируем скролл фона и закрываем по Esc, пока открыт лайтбокс
+  useEffect(() => {
+    if (!selected) return;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setSelected(null); };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [selected]);
+
   return (
     <section className="py-12 sm:py-16">
       <div className="grid grid-cols-2 lg:grid-cols-4">
@@ -404,7 +440,10 @@ function PhotoGrid() {
             <img
               src={src}
               alt={`Техника ${i + 1}`}
+              width={600}
+              height={450}
               loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover hover:scale-105 transition duration-300"
             />
           </div>
@@ -445,7 +484,7 @@ function About() {
     "Установка и перемещение оборудования, погрузо-разгрузочные работы на стройплощадке.",
   ];
   return (
-    <section id="about" className="py-16 sm:py-24 bg-background">
+    <section id="about" className="py-16 sm:py-24 bg-background scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
         <div>
           <SectionHead kicker="Для чего" title="Что мы делаем на наших манипуляторах и спецтехнике" align="left" />
@@ -472,7 +511,7 @@ function About() {
 
 function PriceList() {
   return (
-    <section id="price" className="py-16 sm:py-24">
+    <section id="price" className="py-16 sm:py-24 scroll-mt-20">
       <div className="max-w-5xl mx-auto px-4">
         <SectionHead kicker="Цены" title="Прайс на аренду спецтехники" subtitle="Стоимость указана с учётом подачи в черте города. По области — расчёт индивидуально." />
         <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
@@ -498,14 +537,14 @@ function RequestForm() {
   const handlePhone = (e: React.ChangeEvent<HTMLInputElement>) => {
     let val = e.target.value.replace(/\D/g, "");
     if (val.startsWith("8")) val = "7" + val.slice(1);
-    if (val.startsWith("7")) val = val;
-    else if (val.length > 0) val = "7" + val;
+    else if (val.length > 0 && !val.startsWith("7")) val = "7" + val;
     if (val.length > 11) val = val.slice(0, 11);
     setPhone(val ? "+" + val : "");
     setPhoneError("");
   };
 
   const [isLoading, setIsLoading] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
 const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
@@ -522,28 +561,26 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   const comment = formData.get("comment") as string;
 
   setIsLoading(true);
-  console.log("📤 Отправка заявки...", { name, phone, service, comment });
+  setSubmitError("");
 
   try {
-    const result = await emailjs.send(
+    await emailjs.send(
       "service_0ue7ocr",
       "template_4bosqlk",
       { name, phone, service, comment },
       "Uh9C9nFoNQEKPdprw"
     );
-
-    console.log("✅ Успешно отправлено:", result.status, result.text);
     navigate({ to: "/spasibo" });
   } catch (error) {
-    console.error("❌ Ошибка отправки:", error);
-    navigate({ to: "/spasibo" });
+    console.error("Ошибка отправки заявки:", error);
+    setSubmitError("Не удалось отправить заявку. Попробуйте ещё раз или позвоните нам напрямую.");
   } finally {
     setIsLoading(false);
   }
 };
 
   return (
-    <section id="request" className="relative overflow-hidden">
+    <section id="request" className="relative overflow-hidden scroll-mt-20">
       {/* Фон */}
       <img src={evacuator} alt="" className="absolute inset-0 w-full h-full object-cover" />
       <div className="absolute inset-0 bg-black/70" />
@@ -608,6 +645,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
           <button type="submit" disabled={isLoading} className="btn-primary hover:btn-primary-hover justify-self-start">
   {isLoading ? "Отправка..." : "Отправить заявку"}
 </button>
+          {submitError && <p className="text-sm text-red-400">{submitError}</p>}
           <p className="text-xs text-white/50">
             Нажимая «Отправить», вы соглашаетесь на обработку персональных данных.
           </p>
@@ -618,18 +656,9 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   );
 }
 
-function Field({ label, ...props }: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <div className="grid">
-      <label className="text-sm font-semibold mb-1.5">{label}</label>
-      <input {...props} className="bg-background border border-input rounded-lg px-3 py-3 outline-none focus:ring-2 focus:ring-ring" />
-    </div>
-  );
-}
-
 function Contacts() {
   return (
-    <section id="contacts" className="py-16 sm:py-24">
+    <section id="contacts" className="py-16 sm:py-24 scroll-mt-20">
       <div className="max-w-5xl mx-auto px-4">
         <SectionHead kicker="Контакты" title="Свяжитесь с нами любым удобным способом" />
         <div className="grid sm:grid-cols-3 gap-4">
@@ -677,5 +706,3 @@ function SectionHead({ kicker, title, subtitle, align = "center" }:
     </div>
   );
 }
-
- 
