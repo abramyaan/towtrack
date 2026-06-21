@@ -101,6 +101,17 @@ const priceList = [
   { name: "Мини экскаватор", price: "2 800 ₽/час", min: "Минимум 4 часа (смена 8 ч — 18 000 ₽)" },
 ];
 
+// Внутренние ссылки на разделы страницы (#request, #catalog и т.д.) перехватываются
+// клиентским роутером TanStack Router как обычная навигация — на первом клике это
+// сбрасывает скролл в начало страницы вместо прокрутки к якорю, и только повторный
+// клик (когда роутер уже "на месте") отрабатывает как нативный скролл к разделу.
+// Чтобы это не происходило, на всех внутренних ссылках вызываем preventDefault
+// и скроллим к разделу вручную, без участия роутера.
+function scrollToSection(e: React.MouseEvent<HTMLAnchorElement>, id: string) {
+  e.preventDefault();
+  document.querySelector(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 
 function Index() {
   return (
@@ -167,10 +178,10 @@ function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-          <a href="#catalog" className="hover:text-primary">Каталог</a>
-          <a href="#about" className="hover:text-primary">Услуги</a>
-          <a href="#price" className="hover:text-primary">Цены</a>
-          <a href="#contacts" className="hover:text-primary">Контакты</a>
+          <a href="#catalog" onClick={(e) => scrollToSection(e, "#catalog")} className="hover:text-primary">Каталог</a>
+          <a href="#about" onClick={(e) => scrollToSection(e, "#about")} className="hover:text-primary">Услуги</a>
+          <a href="#price" onClick={(e) => scrollToSection(e, "#price")} className="hover:text-primary">Цены</a>
+          <a href="#contacts" onClick={(e) => scrollToSection(e, "#contacts")} className="hover:text-primary">Контакты</a>
         </nav>
 
         {/* Desktop right */}
@@ -180,7 +191,7 @@ function Header() {
             <Phone className="size-4" />
             +7 (965) 506-78-16
           </a>
-          <a href="#request" className="btn-primary hover:btn-primary-hover text-sm !py-2 !px-4">
+          <a href="#request" onClick={(e) => scrollToSection(e, "#request")} className="btn-primary hover:btn-primary-hover text-sm !py-2 !px-4">
             Заявка
           </a>
         </div>
@@ -290,7 +301,7 @@ function Hero() {
             <div className="grid grid-cols-2 gap-3">
               {utp.map((u) => <UtpCard key={u.title} {...u} compact />)}
             </div>
-            <a href="#request" className="btn-primary hover:btn-primary-hover inline-flex text-lg px-10 py-5 self-center">
+            <a href="#request" onClick={(e) => scrollToSection(e, "#request")} className="btn-primary hover:btn-primary-hover inline-flex text-lg px-10 py-5 self-center">
               Оставить заявку
             </a>
           </div>
@@ -303,7 +314,7 @@ function Hero() {
             <div className="grid grid-cols-2 gap-3">
               {utp.map((u) => <UtpCard key={u.title} {...u} compact />)}
             </div>
-            <a href="#request" className="btn-primary hover:btn-primary-hover inline-flex text-base px-8 py-4 self-center">
+            <a href="#request" onClick={(e) => scrollToSection(e, "#request")} className="btn-primary hover:btn-primary-hover inline-flex text-base px-8 py-4 self-center">
               Оставить заявку
             </a>
           </div>
@@ -402,7 +413,7 @@ function CatalogCard({ title, images, price, specs }: {
             </li>
           ))}
         </ul>
-        <a href="#request" className="btn-primary hover:btn-primary-hover w-full mt-2">
+        <a href="#request" onClick={(e) => scrollToSection(e, "#request")} className="btn-primary hover:btn-primary-hover w-full mt-2">
           Оставить заявку
         </a>
       </div>
